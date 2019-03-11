@@ -1,5 +1,5 @@
 import foo from './foo';
-import bar from './foo';
+import bar from './bar';
 
 export default {
     foo,

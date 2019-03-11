@@ -1,19 +1,19 @@
-import nodeResolve from 'rollup-plugin-node-resolve'
-import babel from 'rollup-plugin-babel'
-import replace from 'rollup-plugin-replace'
-import { terser } from 'rollup-plugin-terser'
+import resolve from 'rollup-plugin-node-resolve';
+import babel from 'rollup-plugin-babel';
+import replace from 'rollup-plugin-replace';
+import { terser } from 'rollup-plugin-terser';
 
-import pkg from './package.json'
-
-
-let fileName = 'project';
-let libName = 'Project';
+import pkg from './package.json';
 
 export default [
-  // CommonJS
+  // CJS
   {
     input: 'src/index.js',
-    output: { file: `dist/lib/${fileName}.js`, format: 'cjs', indent: false },
+    output: { 
+      file: `dist/cjs/${pkg.name}.js`,
+      format: 'cjs',
+      indent: false
+    },
     external: [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
@@ -21,52 +21,32 @@ export default [
     plugins: [babel()]
   },
 
-  // ES
+  // ESM
   {
     input: 'src/index.js',
-    output: { file: `dist/es/${fileName}.js`, format: 'es', indent: false },
+    output: { 
+      file: `dist/esm/${pkg.name}.js`,
+      format: 'es',
+      indent: false
+    },
     external: [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
     ],
     plugins: [babel()]
-  },
-
-  // ES for Browsers
-  {
-    input: 'src/index.js',
-    output: { file: `dist/es/${fileName}.mjs`, format: 'es', indent: false },
-    plugins: [
-      nodeResolve({
-        jsnext: true
-      }),
-      replace({
-        'process.env.NODE_ENV': JSON.stringify('production')
-      }),
-      terser({
-        compress: {
-          pure_getters: true,
-          unsafe: true,
-          unsafe_comps: true,
-          warnings: false
-        }
-      })
-    ]
   },
 
   // UMD Development
   {
     input: 'src/index.js',
     output: {
-      file: `dist/umd/${fileName}.js`,
+      name: pkg.name,
+      file: `dist/umd/${pkg.name}.js`,
       format: 'umd',
-      name: libName,
       indent: false
     },
     plugins: [
-      nodeResolve({
-        jsnext: true
-      }),
+      resolve(),
       babel({
         exclude: 'node_modules/**'
       }),
@@ -80,15 +60,13 @@ export default [
   {
     input: 'src/index.js',
     output: {
-      file: `dist/umd/${fileName}.min.js`,
+      file: `dist/umd/${pkg.name}.min.js`,
       format: 'umd',
-      name: libName,
+      name: pkg.name,
       indent: false
     },
     plugins: [
-      nodeResolve({
-        jsnext: true
-      }),
+      resolve(),
       babel({
         exclude: 'node_modules/**'
       }),
